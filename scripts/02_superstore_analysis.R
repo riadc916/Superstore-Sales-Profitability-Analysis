@@ -82,9 +82,52 @@ ggsave("results/figures/profit_loss_by_subcategory.png",plot = profit_tables,wid
 
                         
                         
+#Sales table and graph by Order Priority
+priority_table <- clean_ana |>
+  group_by(order_priority) |>
+  summarise(
+    order_count=n(),
+    Total_sales=round(sum(sales),2),
+    .groups = 'drop'
+  )|>
+  arrange(desc(Total_sales))
+#formatted tables
+formatted_priority_table <- priority_table |>
+  gt()|>
+  tab_header(
+    title = md("**Table 2. Sales and Order Summary by Order Priority**"),
+    subtitle = "Order Distribution and Total Sales Volume Across Priority Levels"
+  ) |>
+  cols_label(
+    order_priority="Order Priority",
+    order_count="Order Count",
+    Total_sales="Total Sales"
+  )|>
+  tab_options(
+    table.background.color = "#FFFFFF",        
+    table.font.color = "#000000",             
+    column_labels.font.weight = "bold",
+    column_labels.background.color = "#F2F2F2",
+    table_body.border.bottom.color = "#CCCCCC"
+  )
+gtsave(formatted_priority_table,filename = "results/tables/order_priority_table.png")
+#for visualization 
 
-
-
+priority_plot <- ggplot(priority_table,
+       aes(x=reorder(order_priority,Total_sales),
+           y=Total_sales,
+           fill = order_priority))+
+  geom_col()+
+  coord_flip()+
+  labs(
+    title = "Sales volume Analysis by Order Priority",
+    x="Order Priority",
+    y="Total sales",
+    fill="Priority Level"
+  )+
+  theme_minimal()
+ggsave("results/figures/sales_by_order_priority.png",plot = priority_plot,width = 10,height = 6,dpi = 300)
+  
 
 
 

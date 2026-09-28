@@ -128,10 +128,51 @@ priority_plot <- ggplot(priority_table,
   theme_minimal()
 ggsave("results/figures/sales_by_order_priority.png",plot = priority_plot,width = 10,height = 6,dpi = 300)
   
+#Customer from which rigion are generating the most profit for us and what is their preferred shipping method 
+rigion_ship_table <-clean_ana|>
+  group_by(region,ship_mode)|>
+  summarise(
+    Total_Sales=round(sum(sales),2),
+    Total_Profit=round(sum(profit),2),
+    .groups = 'drop'
+  )|>
+  arrange(region,desc(Total_Profit))
 
+formatted_rigion_ship_table <- rigion_ship_table|>
+  gt()|>
+  tab_header(
+    title = md("**Table 3. Regional Sales and Profitability by Shipping Mode**"),
+    subtitle="Performance Analysis Across Geographic Regions and Transportation Logistics"
+  )|>
+  cols_label(
+    region="Region",
+    ship_mode="Ship Mode",
+    Total_Sales="Total Sales",
+    Total_Profit="Total Profit"
+  )|>
+  tab_options(
+    table.background.color = "#FFFFFF",        
+    table.font.color = "#000000",             
+    column_labels.font.weight = "bold",
+    column_labels.background.color = "#F2F2F2",
+    table_body.border.bottom.color = "#CCCCCC"
+  )
+gtsave(formatted_rigion_ship_table,filename = "results/tables/rigion_ship_table.png")
+#formatted_rigion_ship_table visualization
+options(scipen = 999)
+Regional_sales_plot<- ggplot(rigion_ship_table,
+       aes(x=region,
+           y=Total_Sales,
+           fill=ship_mode))+
+  geom_col()+
+  coord_flip()+
+  labs(
+    title = "Regional sales Breakdown by shipping mode",
+    x="Region",
+    y="Total Sales",
+    fill="Shipping Mode"
+  )+
+  theme_minimal()
 
-
-
-
-
+ggsave("results/figures/regional_sales_by_shipping_mode.png",plot =Regional_sales_plot,width = 10,height = 6,dpi = 300 )
 
